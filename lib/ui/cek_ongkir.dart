@@ -150,8 +150,7 @@ class Kota extends GetView<ControllerView> {
           ),
         ),
         asyncItems: (String filter) async {
-          Uri url = Uri.parse(
-              "https://api.rajaongkir.com/starter/city?province=$provId");
+          Uri url = Uri.parse("https://api.rajaongkir.com/starter/city?");
           try {
             final response = await http.get(
               url,
