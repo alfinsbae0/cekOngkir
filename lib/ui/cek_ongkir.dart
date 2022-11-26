@@ -35,12 +35,22 @@ class CekOngkir extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          Provinsi(),
+          Provinsi(tipe: "asal"),
           Obx(
-            () => controller.hiddenKabupaten.isTrue
+            () => controller.hiddenKabupatenasal.isTrue
                 ? SizedBox()
                 : Kota(
-                    provId: controller.provId.value,
+                    provId: controller.provasalId.value,
+                    tipe: 'asal',
+                  ),
+          ),
+          Provinsi(tipe: "tujuan"),
+          Obx(
+            () => controller.hiddenKabupatentujuan.isTrue
+                ? SizedBox()
+                : Kota(
+                    provId: controller.provtujuanId.value,
+                    tipe: 'tujuan',
                   ),
           ),
         ],
@@ -52,7 +62,10 @@ class CekOngkir extends StatelessWidget {
 class Provinsi extends GetView<ControllerView> {
   const Provinsi({
     Key? key,
+    required this.tipe,
   }) : super(key: key);
+
+  final String tipe;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +75,7 @@ class Provinsi extends GetView<ControllerView> {
         clearButtonProps: ClearButtonProps(isVisible: true),
         dropdownDecoratorProps: DropDownDecoratorProps(
           dropdownSearchDecoration: InputDecoration(
-            labelText: "Provinsi Asal",
+            labelText: tipe == "asal" ? "Provinsi Asal" : "Provinsi Tujuan",
             border: OutlineInputBorder(),
           ),
         ),
@@ -96,11 +109,22 @@ class Provinsi extends GetView<ControllerView> {
         },
         onChanged: (prov) {
           if (prov != null) {
-            controller.hiddenKabupaten.value = false;
-            controller.provId.value = int.parse(prov.provinceId!);
+            if (tipe == "asal") {
+              controller.hiddenKabupatenasal.value = false;
+              controller.provasalId.value = int.parse(prov.provinceId!);
+            } else {
+              controller.hiddenKabupatentujuan.value = false;
+              controller.provtujuanId.value = int.parse(prov.provinceId!);
+              ;
+            }
           } else {
-            controller.hiddenKabupaten.value = true;
-            controller.provId.value = 0;
+            if (tipe == "asal") {
+              controller.hiddenKabupatenasal.value = true;
+              controller.provasalId.value = 0;
+            } else {
+              controller.hiddenKabupatentujuan.value = true;
+              controller.provtujuanId.value = 0;
+            }
           }
         },
         popupProps: PopupProps.menu(
@@ -133,9 +157,14 @@ class Provinsi extends GetView<ControllerView> {
 }
 
 class Kota extends GetView<ControllerView> {
-  const Kota({Key? key, required this.provId}) : super(key: key);
+  const Kota({
+    Key? key,
+    required this.provId,
+    required this.tipe,
+  }) : super(key: key);
 
   final int provId;
+  final String tipe;
 
   @override
   Widget build(BuildContext context) {
@@ -145,12 +174,15 @@ class Kota extends GetView<ControllerView> {
         clearButtonProps: ClearButtonProps(isVisible: true),
         dropdownDecoratorProps: DropDownDecoratorProps(
           dropdownSearchDecoration: InputDecoration(
-            labelText: "Kabupaten / Kota Asal",
+            labelText: tipe == "asal"
+                ? "Kabupaten / Kota Asal"
+                : "Kabupaten / Kota Tujuan",
             border: OutlineInputBorder(),
           ),
         ),
         asyncItems: (String filter) async {
-          Uri url = Uri.parse("https://api.rajaongkir.com/starter/city?");
+          Uri url = Uri.parse(
+              "https://api.rajaongkir.com/starter/city?province=$provId");
           try {
             final response = await http.get(
               url,
@@ -177,9 +209,23 @@ class Kota extends GetView<ControllerView> {
             return List<Kabupaten>.empty();
           }
         },
-        onChanged: (value) {
-          if (value != null) {
-            print(value.cityName);
+        onChanged: (cityvalue) {
+          if (cityvalue != null) {
+            if (tipe == "asal") {
+              controller.kotaasalId.value = int.parse(cityvalue.cityId!);
+            } else {
+              controller.kotatujuan.value = int.parse(cityvalue.cityId!);
+            }
+          } else {
+            if (tipe == "asal") {
+              print("Tidak ada");
+            } else {
+              print("tidak ada");
+            }
+          }
+
+          if (cityvalue != null) {
+            print(cityvalue.cityName);
           } else {
             print("Tidak ada");
           }
