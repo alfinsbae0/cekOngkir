@@ -283,11 +283,12 @@ class Berat extends GetView<ControllerView> {
             child: TextField(
               autocorrect: false,
               controller: controller.beratC,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
                 labelText: "Berat Barang",
+                hintText: "Maksimal 30 Kg",
                 border: OutlineInputBorder(),
               ),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
               onChanged: (value) => controller.ubahBerat(value),
             ),
           ),
