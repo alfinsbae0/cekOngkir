@@ -20,12 +20,6 @@ class CekOngkir extends StatelessWidget {
       appBar: AppBar(
         title: Row(
           children: [
-            Image.network(
-              "https://cektarif.com/images/logo-cektarif.png",
-              width: 35,
-              height: 35,
-              fit: BoxFit.fill,
-            ),
             SizedBox(
               width: 5,
             ),
@@ -51,6 +45,27 @@ class CekOngkir extends StatelessWidget {
                 : Kota(
                     provId: controller.provtujuanId.value,
                     tipe: 'tujuan',
+                  ),
+          ),
+          Berat(),
+          Kurir(),
+          SizedBox(
+            height: 20,
+          ),
+          Obx(
+            () => controller.hiddenButton.isTrue
+                ? SizedBox(
+                    height: 10,
+                  )
+                : Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: ElevatedButton(
+                        onPressed: () => controller.cekongkir(),
+                        child: Text("Cek Ongkir"),
+                        style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 20.0),
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white)),
                   ),
           ),
         ],
@@ -219,15 +234,11 @@ class Kota extends GetView<ControllerView> {
           } else {
             if (tipe == "asal") {
               print("Tidak ada");
+              controller.kotaasalId.value = 0;
             } else {
               print("tidak ada");
+              controller.kotatujuan.value = 0;
             }
-          }
-
-          if (cityvalue != null) {
-            print(cityvalue.cityName);
-          } else {
-            print("Tidak ada");
           }
         },
         popupProps: PopupProps.menu(
@@ -237,7 +248,7 @@ class Kota extends GetView<ControllerView> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                 child: Text(
-                  "${item.cityName}" "${item.type}",
+                  "${item.type} " "${item.cityName}",
                   style: TextStyle(fontSize: 20),
                 ),
               ),
@@ -253,7 +264,105 @@ class Kota extends GetView<ControllerView> {
                 hintText: "Search Kabupaten / Kota"),
           ),
         ),
-        itemAsString: (item) => "${item.cityName} ${item.type}",
+        itemAsString: (item) => "${item.type} ${item.cityName}",
+      ),
+    );
+  }
+}
+
+class Berat extends GetView<ControllerView> {
+  const Berat({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              autocorrect: false,
+              controller: controller.beratC,
+              decoration: InputDecoration(
+                labelText: "Berat Barang",
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              onChanged: (value) => controller.ubahBerat(value),
+            ),
+          ),
+          SizedBox(width: 10),
+          Container(
+            width: 130,
+            child: DropdownSearch<String>(
+              popupProps: PopupProps.menu(
+                // showSearchBox: true,
+                searchFieldProps: TextFieldProps(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              items: ["kg", "gr", "ons"],
+              dropdownDecoratorProps: DropDownDecoratorProps(
+                dropdownSearchDecoration: InputDecoration(
+                    labelText: "Satuan Berat", border: OutlineInputBorder()),
+              ),
+              selectedItem: "gram",
+              onChanged: (value) => controller.ubahSatuan(value!),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class Kurir extends GetView<ControllerView> {
+  const Kurir({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Container(
+        child: DropdownSearch<Map<String, dynamic>>(
+          clearButtonProps: ClearButtonProps(isVisible: true),
+          items: [
+            {"code": "jne", "name": "JNE"},
+            {"code": "tiki", "name": "TIKI"},
+            {"code": "pos", "name": "POS"},
+          ],
+          dropdownDecoratorProps: DropDownDecoratorProps(
+            dropdownSearchDecoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: "Kurir",
+            ),
+          ),
+          popupProps: PopupProps.menu(
+            itemBuilder: (context, item, isSelected) => Container(
+              padding: EdgeInsets.all(20),
+              child: Text(
+                "${item['name']}",
+                style: TextStyle(fontSize: 15),
+              ),
+            ),
+          ),
+          onChanged: (value) {
+            if (value != null) {
+              controller.listKurir.value = value["code"];
+              controller.hiddenButton.value = false;
+            } else {
+              controller.hiddenButton.value = true;
+              controller.listKurir.value = "";
+            }
+          },
+          itemAsString: (item) => "${item["name"]}",
+        ),
       ),
     );
   }

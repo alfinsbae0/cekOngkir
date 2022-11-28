@@ -1,5 +1,3 @@
-import 'dart:async';
-
 class Province {
   Province({
     required this.provinceId,

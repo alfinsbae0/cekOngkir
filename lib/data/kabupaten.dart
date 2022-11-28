@@ -1,5 +1,3 @@
-import 'dart:async';
-
 class Kabupaten {
   Kabupaten({
     required this.cityId,
